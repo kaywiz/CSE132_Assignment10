@@ -19,6 +19,7 @@ public class CountStepsHealth {
 		BufferedReader br = null;
 		String line = "";
 		String csvSplitBy = ",";
+		int counter = 0;
 		try {
 			SerialComm s = new SerialComm();
 			s.connect("/dev/cu.usbserial-DN00MZW8");
@@ -27,28 +28,53 @@ public class CountStepsHealth {
 			ArrayList<Double> dataX = new ArrayList<Double>();
 			int i=0;
 			while ((line = br.readLine()) != null) {
-				String[] initial = new String[3];
-				initial = line.split(csvSplitBy);
-				//System.out.println("X: " + initial[0] + ", Y: "+ initial[1] + " , Z: " + initial[2]);
-						dataX.add(Double.parseDouble(initial[2]));
-				//System.out.println("X: " + data[i][0] + ", Y: "+ data[i][1] + " , Z: " + data[i][2]);
-				if(i>2){
+				if(br.readLine() == "!\n"){
+					counter = 0;
+					//return;
+				}
+				else{
+					String[] initial = new String[3];
+					initial = line.split(csvSplitBy);
+					//System.out.println("X: " + initial[0] + ", Y: "+ initial[1] + " , Z: " + initial[2]);
+					dataX.add(Double.parseDouble(initial[2]));
+					//System.out.println("X: " + data[i][0] + ", Y: "+ data[i][1] + " , Z: " + data[i][2]);
+					if(i>2){
+						if((dataX.get(i-1) > 0) && (dataX.get(i-2) < 0)){
+							//System.out.println("Z: " + dataX.get(i) + ", is a step");
+							++counter;
+							System.out.println(counter + " steps");
+						}
+						/*
+					if((dataX.get(i-1) < 0) && (dataX.get(i-2) > 0)){
+						//System.out.println("Z: " + dataX.get(i) + ", is a step");
+						++counter;
+						System.out.println(counter + " steps");
+					}*/
+						else{
+							//System.out.println("Z: " + dataX.get(i) + ", is NOT a step");
+							System.out.println(counter + " steps");
+						}
+						/*
 					if((dataX.get(i-1) > dataX.get(i-2)) && (dataX.get(i-1) > dataX.get(i))){
 						System.out.println("Z: " + dataX.get(i) + ", is a step");
+						++counter;
+						System.out.println(counter + " steps");
 					}
 					else{
 						System.out.println("Z: " + dataX.get(i) + ", is NOT a step");
 					}
-					
+
 				}
-				++i;
+						 */
+
+					}
+
+					++i;
+				}
 			}
 
-			
-			
-			
 		}
-	
+
 		catch (FileNotFoundException e){
 			e.printStackTrace();
 		}
@@ -62,8 +88,8 @@ public class CountStepsHealth {
 	}
 
 
-	
-	
+
+
 }
 
 
